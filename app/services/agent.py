@@ -2,8 +2,12 @@ import os
 
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.agents import create_agent
 
-from app.tools.finance_tools import get_spending_summary
+from app.tools.finance_tools import (
+    get_spending_summary,
+    get_total_spending
+)
 
 
 load_dotenv()
@@ -15,22 +19,27 @@ llm = ChatGoogleGenerativeAI(
 )
 
 
-llm_with_tools = llm.bind_tools([
-    get_spending_summary
-])
-
-
-response = llm_with_tools.invoke(
-    "How much money have I spent in each category?"
+agent = create_agent(
+    model=llm,
+    tools=[
+        get_spending_summary,
+        get_total_spending
+    ]
 )
 
 
-print("Tool calls:")
-print(response.tool_calls)
+user_question = "How much money have I spent in total?"
 
 
-# Execute the tool
-tool_result = get_spending_summary.invoke({})
+response = agent.invoke({
+    "messages": [
+        {
+            "role": "user",
+            "content": user_question
+        }
+    ]
+})
 
-print("\nTool result:")
-print(tool_result)
+
+print("Agent response:")
+print(response["messages"][-1].content)

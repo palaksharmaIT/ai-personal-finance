@@ -29,6 +29,21 @@ def get_spending_summary():
         db.close()
 
 
-if __name__ == "__main__":
-    result = get_spending_summary.invoke({})
-    print(result)
+@tool
+def get_total_spending():
+    """Get the total amount spent across all transactions."""
+
+    db = SessionLocal()
+
+    try:
+        transactions = db.query(Transaction).all()
+
+        total = 0
+
+        for transaction in transactions:
+            total += transaction.amount
+
+        return total
+
+    finally:
+        db.close()
