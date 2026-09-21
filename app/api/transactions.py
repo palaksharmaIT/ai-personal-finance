@@ -36,10 +36,19 @@ def create_transaction(
     return new_transaction
 
 
-@router.get("/transactions/")
-def get_transactions(db: Session = Depends(get_db)):
-    transactions = db.query(Transaction).all()
-    return transactions
+@router.get("/transactions/{transaction_id}")
+def get_transaction(
+    transaction_id: int,
+    db: Session = Depends(get_db)
+):
+    transaction = db.query(Transaction).filter(
+        Transaction.id == transaction_id
+    ).first()
+
+    if not transaction:
+        return {"message": "Transaction not found"}
+
+    return transaction
 
 
 @router.get("/transactions/summary")

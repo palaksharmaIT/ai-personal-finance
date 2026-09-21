@@ -47,3 +47,28 @@ def get_total_spending():
 
     finally:
         db.close()
+
+
+@tool
+def get_transactions():
+    """Get all transactions from the database."""
+
+    db = SessionLocal()
+
+    try:
+        transactions = db.query(Transaction).all()
+
+        result = []
+
+        for transaction in transactions:
+            result.append({
+                "amount": transaction.amount,
+                "category": transaction.category,
+                "description": transaction.description,
+                "transaction_type": transaction.transaction_type
+            })
+
+        return result
+
+    finally:
+        db.close()

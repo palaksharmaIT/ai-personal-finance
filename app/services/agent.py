@@ -6,7 +6,8 @@ from langchain.agents import create_agent
 
 from app.tools.finance_tools import (
     get_spending_summary,
-    get_total_spending
+    get_total_spending,
+    get_transactions
 )
 
 
@@ -23,12 +24,27 @@ agent = create_agent(
     model=llm,
     tools=[
         get_spending_summary,
-        get_total_spending
-    ]
+        get_total_spending,
+        get_transactions
+    ],
+    system_prompt="""
+You are a personal finance assistant.
+
+The user's financial data is stored in the database.
+
+Currency:
+All amounts are in Indian Rupees (INR).
+Always display amounts using ₹.
+
+Rules:
+- Use the available tools when you need financial data.
+- Never invent transaction or spending data.
+- Give simple and clear answers.
+"""
 )
 
 
-user_question = "How much money have I spent in total?"
+user_question = "Show me my transactions."
 
 
 response = agent.invoke({
